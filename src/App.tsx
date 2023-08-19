@@ -1,12 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
+import React,{ useState } from 'react'
 import './App.css';
+import { Transition } from '@headlessui/react'
 
 function App() {
+
+  const [isShowing, setIsShowing] = useState(true)
+
+
+
+
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+
+          <h1>hello</h1>
+    
+        <button
+        className="bg-sky-500 hover:bg-sky-700"
+        onClick={() => setIsShowing((isShowing) => !isShowing)}
+        >
+          Toggle
+        </button>
+        {/* <img src={logo} className="App-logo" alt="logo" />
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
@@ -17,7 +33,7 @@ function App() {
           rel="noopener noreferrer"
         >
           Learn React
-        </a>
+        </a> */}
       </header>
     </div>
   );
