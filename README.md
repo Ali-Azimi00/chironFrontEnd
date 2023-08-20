@@ -2,6 +2,15 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Dependencies/Libraries
+npm i bootstrap@5.3.1
+npm i bootstrap @types/bootstrap react-bootstrap @types/react-bootstrap -D
+
+npm install axios
+npm i -D react-router-dom
+npm install apexcharts --save
+
+
 ## Available Scripts
 
 In the project directory, you can run:

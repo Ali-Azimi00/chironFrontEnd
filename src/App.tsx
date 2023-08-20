@@ -1,28 +1,26 @@
-import React,{ useState } from 'react'
+import React, { useState } from 'react'
 import './App.css';
-import { Transition } from '@headlessui/react'
+// import * as Bootstrap from 'bootstrap'
+import Header from './components/Header';
+import Navbar from './components/NavBar';
+
 
 function App() {
-
-  const [isShowing, setIsShowing] = useState(true)
-
-
-
-
 
   return (
     <div className="App">
       <header className="App-header">
+        <div>
+          <Navbar></Navbar>
+        </div>
 
-          <h1>hello</h1>
-    
-        <button
-        className="bg-sky-500 hover:bg-sky-700"
-        onClick={() => setIsShowing((isShowing) => !isShowing)}
-        >
-          Toggle
-        </button>
-        {/* <img src={logo} className="App-logo" alt="logo" />
+        <div className='container'>
+          <Header></Header>
+          
+        </div>
+
+        <div>
+          {/* <img src={logo} className="App-logo" alt="logo" />
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
@@ -34,7 +32,12 @@ function App() {
         >
           Learn React
         </a> */}
+
+        </div>
+
       </header>
+
+
     </div>
   );
 }
