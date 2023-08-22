@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ProgChart from './ProgChart';
 
 function Header() {
 
@@ -6,9 +7,9 @@ function Header() {
 
     return (
         <React.Fragment>
-            <div className="px-auto">
+            <div className="container">
 
-                <h1 className='text-blue' hidden={isShowing}>Welcom to Chiron</h1>
+                <h1 className='text-primary' hidden={isShowing}>Welcom to Chiron</h1>
 
                 <button
                     type="button" className="btn btn-warning gradient"
@@ -16,6 +17,7 @@ function Header() {
                 >
                     Toggle
                 </button>
+
                 
             </div>
         </React.Fragment>

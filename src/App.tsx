@@ -1,22 +1,37 @@
-import React, { useState } from 'react'
+// import React from 'react'
 import './App.css';
 // import * as Bootstrap from 'bootstrap'
 import Header from './components/Header';
 import Navbar from './components/NavBar';
+// import ProgChart from './components/ProgChart2'
+import ProgChart from './components/ProgChart'
+
 
 
 function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
+      <header className="App-header ">
         <div>
           <Navbar></Navbar>
         </div>
 
         <div className='container'>
-          <Header></Header>
-          
+          <div className='row'>
+            <Header></Header>
+          </div>
+          <div className='row chart1'>
+            <div className=''>
+              <div className=''>
+                <ProgChart></ProgChart>
+
+              </div>
+            </div>
+          </div>
+
+          {/* <ProgChart></ProgChart> */}
+
         </div>
 
         <div>

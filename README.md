@@ -8,7 +8,7 @@ npm i bootstrap @types/bootstrap react-bootstrap @types/react-bootstrap -D
 
 npm install axios
 npm i -D react-router-dom
-npm install apexcharts --save
+npm install --save react-apexcharts apexcharts
 
 
 ## Available Scripts
