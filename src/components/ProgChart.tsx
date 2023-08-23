@@ -1,18 +1,55 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import ReactApexChart from 'react-apexcharts'
 import '../styles/charts.css'
+import axios from 'axios'
 
 
-function ProgChart({ }: Object) {
+interface Tasks{
+    taskId: number;
+    taskName: String;
+    measureOfTask: String;
+    minReq: number,
+    exPoints: 2
+}
 
-    const [showChart, setShowChart] = useState(false)
-    console.log(showChart)
+interface Experience{
+    Task: Tasks;
+    Date: Date;
+}
 
-    useEffect(() => {
-        setShowChart(false)
-    }, [showChart])
 
-    const [series] = useState<any>([
+function ProgChart({}: Object) {
+
+    const [progData, setProgData] = useState<Experience[]>([])
+
+    const fetchProgData = useCallback(async()=>{
+
+        try{
+            const url = "http://localhost:8080/experience/1";
+
+            const response = await axios.get(url)
+            console.log("Response", response)
+
+            
+
+             setProgData(response.data)
+                        
+        }
+        catch(error){
+
+            console.error("axios call failed")
+            console.error(error)
+
+        }
+
+    },[])
+
+    useEffect(()=>{
+        fetchProgData();
+    },[fetchProgData])
+
+
+     const [series] = useState<any>([
         {
             name: 'Water',
             data: [1, 30, 1, 1, 3, 1, 3, 1, 3, 3, 1, 3]
@@ -51,10 +88,12 @@ function ProgChart({ }: Object) {
         }
     ]);
 
+    console.log("progData", progData)
+
+
     console.log(series.length)
     const [options] = useState<Object>(
         {
-
             // states: {
             //     normal: {
             //         filter: {
@@ -76,8 +115,6 @@ function ProgChart({ }: Object) {
             //         }
             //     },
             // },
-
-
             theme: {
                 mode: 'dark',
                 // palette: 'palette1',
@@ -173,6 +210,7 @@ function ProgChart({ }: Object) {
             legend: {
                 show: false
             },
+            //DATE GOES HERE
             labels: ["8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21"],
             grid: {
                 show: false,
@@ -217,11 +255,13 @@ function ProgChart({ }: Object) {
             <ReactApexChart
                 options={options} series={series}
                 type="heatmap" height={350}
-                onClick={() => {
-                    setShowChart(!showChart)
-                }}
+               
                 hidden={false}
             />
+
+            <button onClick={()=>{
+                console.log(fetchProgData)
+            }}> here </button>
         </div>
     )
 }
