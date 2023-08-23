@@ -15,7 +15,7 @@ function ProgChart({ }: Object) {
     const [series] = useState<any>([
         {
             name: 'Water',
-            data: [1, 3, 1, 1, 3, 1, 3, 1, 3, 3, 1, 3]
+            data: [1, 30, 1, 1, 3, 1, 3, 1, 3, 3, 1, 3]
         },
         {
             name: 'Stretch',
@@ -78,14 +78,12 @@ function ProgChart({ }: Object) {
             // },
 
 
-
-
             theme: {
                 mode: 'dark',
                 // palette: 'palette1',
                 monochrome: {
                     enabled: false,
-                    color: '#ffc107',
+                    color: '#39d353',
                     shadeTo: 'dark',
                     shadeIntensity: .5
                 },
@@ -97,7 +95,7 @@ function ProgChart({ }: Object) {
                 labels: {
                     rotate: -90,
                     style: {
-                        colors: ["#fff", "#fff", "#fff", "#fff", "#fff", "#fff", "#fff", "#fff", "#fff", "#fff", "#fff", "#fff"]
+                        colors: ["#3f3f3f", "#3f3f3f", "#3f3f3f", "#3f3f3f", "#3f3f3f", "#3f3f3f", "#3f3f3f", "#3f3f3f", "#3f3f3f", "#3f3f3f", "#3f3f3f", "#3f3f3f"]
                     }
                 },
                 axisTicks: {
@@ -119,7 +117,7 @@ function ProgChart({ }: Object) {
                     align: 'right',
                     maxWidth: 160,
                     style: {
-                        colors: ["#fff", "#fff", "#fff", "#fff", "#fff", "#fff", "#fff", "#fff", "#fff", "#fff", "#fff", "#fff"]
+                        colors: ["#3f3f3f", "#3f3f3f", "#fff", "#fff", "#fff", "#fff", "#fff", "#fff", "#fff", "#fff", "#fff", "#fff"]
                     },
                     offsetX: -17,
                     offsetY: 0,
@@ -144,7 +142,7 @@ function ProgChart({ }: Object) {
                     enabled: true,
                     top: 0,
                     left: 0,
-                    blur: 6,
+                    blur: 3,
                     color: '#fff',
                     opacity: .4
                 },
@@ -220,7 +218,7 @@ function ProgChart({ }: Object) {
                 options={options} series={series}
                 type="heatmap" height={350}
                 onClick={() => {
-                    setShowChart(true)
+                    setShowChart(!showChart)
                 }}
                 hidden={false}
             />

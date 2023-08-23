@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Navbar from './components/NavBar';
 // import ProgChart from './components/ProgChart2'
 import ProgChart from './components/ProgChart'
+import DeltaBtnGrp from './components/DeltaBtnGrp';
 
 
 
@@ -19,15 +20,13 @@ function App() {
 
         <div className='container'>
           <div className='row'>
-            <Header></Header>
+            {/* <Header></Header> */}
           </div>
           <div className='row chart1'>
-            <div className=''>
-              <div className=''>
-                <ProgChart></ProgChart>
-
-              </div>
-            </div>
+            <ProgChart></ProgChart>
+          </div>
+          <div className='row'>
+            <DeltaBtnGrp></DeltaBtnGrp>
           </div>
 
           {/* <ProgChart></ProgChart> */}

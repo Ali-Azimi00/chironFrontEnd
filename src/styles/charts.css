@@ -31,3 +31,21 @@
     }
 } 
 
+.chartBtn1{
+    background-color: var(--accent);
+}
+.chartBtn1:hover{
+    box-shadow: inset .1px 1px 5px white;
+    text-shadow: 1px 1px 4px white;
+
+}
+
+.chartBtn2{
+    border-width: 0px;
+}
+.chartBtn2:hover{
+    box-shadow: inset -1px -1px 5px black;
+    text-shadow: 1px 1px 4px white;
+    color: black;
+
+}

@@ -8,12 +8,12 @@ function NavBar() {
     return (
         <div>
             <nav className="navbar bg-gradient"
-            // style={{"position":"absolute"}}
+            style={{backgroundColor:"var(--gray)"}}
             >
                 <div className="container-fluid">
                 
                     <img className="img" style={{width:50}} src={AAlogo}/>
-                    <p className='justify-start'>Chiron</p>
+                    <p className='justify-start'></p>
            
                     
                     <button className='navbar-toggler-icon rounded bg-warning'></button>
