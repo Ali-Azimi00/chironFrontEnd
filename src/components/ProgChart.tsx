@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
-import ReactApexChart from 'react-apexcharts'
-import '../styles/charts.css'
-import axios from 'axios'
+import ReactApexChart from 'react-apexcharts';
+import '../styles/charts.css';
+import axios from 'axios';
 
-
-interface Tasks{
+interface Tasks {
     taskId: number;
     taskName: String;
     measureOfTask: String;
@@ -12,47 +11,69 @@ interface Tasks{
     exPoints: 2
 }
 
-interface Experience{
-    Task: Tasks;
-    Date: Date;
+interface Experience {
+    experienceId: number;
+    task: Tasks;
+    date: Date;
 }
 
 
-function ProgChart({}: Object) {
+
+function ProgChart({ }: Object) {
 
     const [progData, setProgData] = useState<Experience[]>([])
+    const [taskData, setTaskData] = useState<Tasks[]>([])
+    const [dateList, setDateList] = useState<Date[]>([])
 
-    const fetchProgData = useCallback(async()=>{
-
-        try{
+    const fetchProgData = useCallback(async () => {
+        try {
             const url = "http://localhost:8080/experience/1";
-
             const response = await axios.get(url)
-            console.log("Response", response)
 
-            
+            setProgData(response.data)
 
-             setProgData(response.data)
-                        
+
         }
-        catch(error){
-
+        catch (error) {
             console.error("axios call failed")
             console.error(error)
-
         }
+    }, [])
 
-    },[])
-
-    useEffect(()=>{
+    useEffect(() => {
         fetchProgData();
-    },[fetchProgData])
+
+    }, [fetchProgData])
+
+    console.log("progData", progData)
+
+    function returnDates(e: any) {
+        var dateTime = new Date()
+        // const today = dateTime.toLocaleDateString("en-CA");
+        dateTime.setDate(dateTime.getDate() - 5);
+        const dateLimit = dateTime.toLocaleDateString("en-CA")
+        return e.date > dateLimit;
+    }
+    const recentData = progData.filter(returnDates)
+
+    useEffect(() => { //TODO fix begin adding taskdata
+        setTaskData(recentData.map((e) => { return e.task }))
+    }, [])
+
+    const dateArr = new Array<Date>();
+    useEffect(() => {
+        recentData.map((e: Experience) => { dateArr.push(e.date) });
+        setDateList(dateArr)
+    }, [progData])
+    console.log("dateList", dateList)
 
 
-     const [series] = useState<any>([
+
+
+    const [series] = useState<any>([
         {
             name: 'Water',
-            data: [1, 30, 1, 1, 3, 1, 3, 1, 3, 3, 1, 3]
+            data: [3, 1, 1, 3, 1, 3, 1, 3, 1, 3, 1, 1,]
         },
         {
             name: 'Stretch',
@@ -80,7 +101,7 @@ function ProgChart({}: Object) {
         },
         {
             name: 'Core',
-            data: [1, 1, 3, 1, 3, 1, 1, 3, 3, 3, 1,3]
+            data: [1, 1, 3, 1, 3, 1, 1, 3, 3, 3, 1, 3]
         },
         {
             name: 'Cardio',
@@ -88,10 +109,8 @@ function ProgChart({}: Object) {
         }
     ]);
 
-    console.log("progData", progData)
 
 
-    console.log(series.length)
     const [options] = useState<Object>(
         {
             // states: {
@@ -132,7 +151,10 @@ function ProgChart({}: Object) {
                 labels: {
                     rotate: -90,
                     style: {
-                        colors: ["#3f3f3f", "#3f3f3f", "#3f3f3f", "#3f3f3f", "#3f3f3f", "#3f3f3f", "#3f3f3f", "#3f3f3f", "#3f3f3f", "#3f3f3f", "#3f3f3f", "#3f3f3f"]
+                        colors: ["#3f3f3f", "#3f3f3f", "#3f3f3f",
+                            "#3f3f3f", "#3f3f3f", "#3f3f3f",
+                            "#3f3f3f", "#3f3f3f", "#3f3f3f",
+                            "#3f3f3f", "#3f3f3f", "#3f3f3f"]
                     }
                 },
                 axisTicks: {
@@ -143,7 +165,6 @@ function ProgChart({}: Object) {
                     offsetX: 0,
                     offsetY: 0
                 }
-
             },
             yaxis: {
                 lines: {
@@ -161,7 +182,6 @@ function ProgChart({}: Object) {
                     rotate: 0,
 
                 },
-
             },
             chart: {
                 width: 300,
@@ -255,13 +275,12 @@ function ProgChart({}: Object) {
             <ReactApexChart
                 options={options} series={series}
                 type="heatmap" height={350}
-               
+
                 hidden={false}
             />
-
-            <button onClick={()=>{
-                console.log(fetchProgData)
-            }}> here </button>
+            {/* <button onClick={()=>{
+                console.log(progData)
+            }}> here </button> */}
         </div>
     )
 }
