@@ -3,50 +3,45 @@ import ReactApexChart from 'react-apexcharts';
 import '../styles/charts.css';
 import axios from 'axios';
 
-interface Tasks {
+interface ITasks {
     taskId: number;
-    taskName: String;
-    measureOfTask: String;
+    taskName: string;
+    measureOfTask: string;
     minReq: number,
-    exPoints: 2
+    exPoints: 2,
+    [key: string]: number | string
 }
 
-interface Experience {
+interface IExperience {
     experienceId: number;
-    task: Tasks;
+    tasks: ITasks;
     date: Date;
 }
 
-
-
 function ProgChart({ }: Object) {
 
-    const [progData, setProgData] = useState<Experience[]>([])
-    const [taskData, setTaskData] = useState<Tasks[]>([])
+    const [progData, setProgData] = useState<IExperience[]>([])
+    const [taskData, setTaskData] = useState<ITasks[]>([])
     const [dateList, setDateList] = useState<Date[]>([])
+
+    let taskMap = new Map<String, IExperience[]>();
+    taskMap.set('reading', []);
 
     const fetchProgData = useCallback(async () => {
         try {
             const url = "http://localhost:8080/experience/1";
             const response = await axios.get(url)
-
             setProgData(response.data)
-
-
         }
         catch (error) {
             console.error("axios call failed")
             console.error(error)
         }
     }, [])
-
     useEffect(() => {
         fetchProgData();
-
     }, [fetchProgData])
-
-    console.log("progData", progData)
-
+    //DateRangeData
     function returnDates(e: any) {
         var dateTime = new Date()
         // const today = dateTime.toLocaleDateString("en-CA");
@@ -54,26 +49,75 @@ function ProgChart({ }: Object) {
         const dateLimit = dateTime.toLocaleDateString("en-CA")
         return e.date > dateLimit;
     }
+
+    function taskIdentification(e: any) {
+
+        return e;
+        // return e.experience.tasks == 'reading'
+    }
+
     const recentData = progData.filter(returnDates)
-
-    useEffect(() => { //TODO fix begin adding taskdata
-        setTaskData(recentData.map((e) => { return e.task }))
-    }, [])
-
+    //DateList
     const dateArr = new Array<Date>();
     useEffect(() => {
-        recentData.map((e: Experience) => { dateArr.push(e.date) });
+        recentData.map((e: IExperience) => { dateArr.push(e.date) });
         setDateList(dateArr)
     }, [progData])
-    console.log("dateList", dateList)
+    // console.log("dateList", dateList)
+
+
+    //TaskList
+    const taskArr = new Array<ITasks>();
+    useEffect(() => {
+        recentData.map((exp: IExperience) => {
+            taskArr.push(exp.tasks)
+            console.log('expArr', exp.tasks.taskName)
+
+           
+            
+            // function filterTaskName(e: IExperience) {
+                if ( exp.tasks.taskName == 'reading') {
+                    let expArr: any = taskMap.get('reading')
+                    expArr.push(exp);
+                    taskMap.set('reading', expArr);
+
+                    return exp
+                }
+            // }
+
+            // let expArr: any = taskMap.get('reading')
+            // expArr.push(exp);
+            // taskMap.set('reading', expArr)
+            console.log('READING', taskMap)
+
+        })
+
+        setTaskData(taskArr)
+
+
+    }, [progData])
+    console.log("taskList", taskData)
+
+    const currentTask = recentData.filter(taskIdentification)
+
+    console.log("currentTask", currentTask)
+    // useEffect(()=>{
+
+    //     // setSeries((prevState)=>{
+    //     //     pv={...prevState};
+    //     //     prevState[0]
+    //     // })
+    // })
 
 
 
+    
 
-    const [series] = useState<any>([
+    //complete:1, incomoplete: 3, nothing: 0
+    const [series, setSeries] = useState<any>([
         {
             name: 'Water',
-            data: [3, 1, 1, 3, 1, 3, 1, 3, 1, 3, 1, 1,]
+            data: []
         },
         {
             name: 'Stretch',
