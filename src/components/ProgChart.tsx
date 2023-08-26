@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import '../styles/charts.css';
 import axios from 'axios';
+import { ServerResponse } from "http";
+import userEvent from '@testing-library/user-event';
 
 interface ITasks {
     taskId: number;
@@ -14,18 +16,84 @@ interface ITasks {
 
 interface IExperience {
     experienceId: number;
+    completedQty: number;
     tasks: ITasks;
     date: Date;
+}
+
+interface IData {
+    date: Date;
+    taskName: String;
+    quantity: number;
+}
+
+interface ISeries {
+    name: String;
+    data: Array<number> | undefined;
 }
 
 function ProgChart({ }: Object) {
 
     const [progData, setProgData] = useState<IExperience[]>([])
-    const [taskData, setTaskData] = useState<ITasks[]>([])
-    const [dateList, setDateList] = useState<Date[]>([])
+    const [data1, setData1] = useState<IData[]>([])
+    const [currentDates, setCurrentDates] = useState<any>([])
 
-    let taskMap = new Map<String, IExperience[]>();
-    taskMap.set('reading', []);
+    let dateMap = new Map<Date, IExperience>([])
+    for (let i=0; i< progData.length; i++){
+        let currentProg = progData[i];
+        dateMap.set(currentProg.date,currentProg)
+    }
+    /////////////////////////////////////////////
+    let taskMap = new Map<String, ITasks>()
+    for (let i = 0; i < progData.length; i++) {
+        let currentProg = progData[i];
+        taskMap.set(currentProg.tasks.taskName, currentProg.tasks)
+    }
+    console.log('taskMap', taskMap)
+
+    ///////////////////////////////////////////////////////////
+
+    let dataMap = new Map<String, IData>()
+    for (let i = 0; i < progData.length; i++) {
+        let currentDataProg = progData[i];
+        dataMap.set(currentDataProg.tasks.taskName, data1[i])
+    }
+
+    ///////////////////////////////////////////////////////////
+    let seriesMap = new Map<String, ISeries>()
+
+    taskMap.forEach((value, key) => {
+        let seriesPt = {
+            name: key,
+            data: []
+        }
+        seriesMap.set(key, seriesPt)
+    })
+
+    for (let i = 0; i < progData.length; i++) {
+        let currentProg = progData[i]
+
+        seriesMap.forEach((value, key1) => {
+            // console.log('key/value',key1,value)
+            let quantity: any = currentProg.completedQty;
+
+            if (currentProg.tasks.taskName == key1) {
+                let prevData: any | undefined = seriesMap.get(key1)?.data
+                prevData?.push(quantity)
+                // console.log('prevData', key1, prevData)
+                let value1: ISeries = {
+                    name: key1,
+                    data: prevData
+                }
+                seriesMap.set(key1, value1)
+            }
+        })
+        //  console.log("seriesMap",seriesMap)
+        // seriesMap.set(currentProg.tasks.taskName, currentSeriesData)
+
+    }
+    console.log("push", seriesMap.get('push'))
+
 
     const fetchProgData = useCallback(async () => {
         try {
@@ -38,124 +106,85 @@ function ProgChart({ }: Object) {
             console.error(error)
         }
     }, [])
+
     useEffect(() => {
         fetchProgData();
     }, [fetchProgData])
-    //DateRangeData
-    function returnDates(e: any) {
-        var dateTime = new Date()
-        // const today = dateTime.toLocaleDateString("en-CA");
-        dateTime.setDate(dateTime.getDate() - 5);
-        const dateLimit = dateTime.toLocaleDateString("en-CA")
-        return e.date > dateLimit;
-    }
 
-    function taskIdentification(e: any) {
-
-        return e;
-        // return e.experience.tasks == 'reading'
-    }
-
-    const recentData = progData.filter(returnDates)
-    //DateList
-    const dateArr = new Array<Date>();
-    useEffect(() => {
-        recentData.map((e: IExperience) => { dateArr.push(e.date) });
-        setDateList(dateArr)
-    }, [progData])
-    // console.log("dateList", dateList)
-
-
-    //TaskList
-    const taskArr = new Array<ITasks>();
-    useEffect(() => {
-        recentData.map((exp: IExperience) => {
-            taskArr.push(exp.tasks)
-            console.log('expArr', exp.tasks.taskName)
-
-           
-            
-            // function filterTaskName(e: IExperience) {
-                if ( exp.tasks.taskName == 'reading') {
-                    let expArr: any = taskMap.get('reading')
-                    expArr.push(exp);
-                    taskMap.set('reading', expArr);
-
-                    return exp
+    const updateData = () => {
+        setData1((prevState) => {
+            let pd = { ...prevState }
+            for (let i = 0; i < progData.length; i++) {
+                let currentData: IData = {
+                    date: progData[i].date,
+                    taskName: progData[i].tasks.taskName,
+                    quantity: progData[i].completedQty
                 }
-            // }
-
-            // let expArr: any = taskMap.get('reading')
-            // expArr.push(exp);
-            // taskMap.set('reading', expArr)
-            console.log('READING', taskMap)
-
+                pd[i] = currentData
+            }
+            return pd
         })
+    }
 
-        setTaskData(taskArr)
-
-
+    useEffect(() => {
+        updateData();
     }, [progData])
-    console.log("taskList", taskData)
+    // console.log('data', data1)
 
-    const currentTask = recentData.filter(taskIdentification)
+    //////////////////////////////////////////////////////////////////////////////////////////
 
-    console.log("currentTask", currentTask)
-    // useEffect(()=>{
-
-    //     // setSeries((prevState)=>{
-    //     //     pv={...prevState};
-    //     //     prevState[0]
-    //     // })
-    // })
-
-
-
-    
 
     //complete:1, incomoplete: 3, nothing: 0
     const [series, setSeries] = useState<any>([
-        {
-            name: 'Water',
-            data: []
-        },
-        {
-            name: 'Stretch',
-            data: [1, 3, 1, 3, 1, 1, 3, 1, 1, 3, 1, 1]
-        },
-        {
-            name: 'Potion',
-            data: [1, 1, 3, 1, 3, 1, 3, 1, 1, 3, 1, 3]
-        },
-        {
-            name: 'Read',
-            data: [1, 3, 1, 3, 1, 1, 1, 3, 1, 3, 3, 1]
-        },
-        {
-            name: 'Language',
-            data: [3, 1, 3, 3, 1, 1, 3, 1, 1, 3, 1, 1,]
-        },
-        {
-            name: 'Push',
-            data: [1, 3, 1, 3, 1, 1, 1, 3, 1, 3, 3, 1]
-        },
-        {
-            name: 'Pull',
-            data: [1, 3, 1, 3, 1, 1, 3, 1, 1, 3, 1, 1]
-        },
-        {
-            name: 'Core',
-            data: [1, 1, 3, 1, 3, 1, 1, 3, 3, 3, 1, 3]
-        },
-        {
-            name: 'Cardio',
-            data: [3, 1, 1, 3, 1, 3, 1, 3, 1, 3, 1, 1,]
-        }
+        // {
+        //     name: 'reading',
+        //     data: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        // },
+        // {
+        //     name: 'push',
+        //     data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        // },
+        // {
+        //     name: 'sprint',
+        //     data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        // },
+
     ]);
 
+    // const updateSeries = () => {
+    //     const seriesArr = new Array<any>();
 
+    //     for (let i = 0; i < data1.length; i++) {
+    //         seriesArr.push(data1[i])
+    //     }
+    //     console.log('seriesArr', seriesArr)
 
-    const [options] = useState<Object>(
+    //     setSeries(seriesArr)
+    // }
+
+    useEffect(()=>{
+        updateSeries();
+        giveDates();
+    },[progData])
+
+    function updateSeries(){
+        setSeries(()=>{
+            let pd : any = []
+            seriesMap.forEach((value,key:String)=>{
+                let dataPt = {
+                    name: key,
+                    data: value.data
+                }
+                pd.push(dataPt)
+            })
+            return pd;
+        })
+
+    }
+
+    console.log('SERIES', series)
+
+    const [options, setOptions] = useState<any>(
         {
             // states: {
             //     normal: {
@@ -275,7 +304,8 @@ function ProgChart({ }: Object) {
                 show: false
             },
             //DATE GOES HERE
-            labels: ["8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21"],
+            labels: currentDates,
+            // ["8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21"],
             grid: {
                 show: false,
                 padding: {
@@ -305,7 +335,7 @@ function ProgChart({ }: Object) {
                             // foreColor: "#dc3545",
                             name: undefined,
                         }],
-                        inverse: false,
+                        inverse: true,
                         min: 0,
                         max: 3
                     },
@@ -313,6 +343,42 @@ function ProgChart({ }: Object) {
             }
         }
     );
+
+    const giveDates=()=>{
+        // let dateArr: any[]=[]
+
+        // dateMap.forEach((value,key)=>{
+
+        //     let keyString = key.toString()
+
+        //     dateArr.push(keyString)
+        // })
+
+        // console.log(dateArr)
+        // return [dateArr];
+        setCurrentDates(()=>{
+            let pd: Array<String>=[]
+
+            // for(let i=0; i<dateMap.size;i++){
+                dateMap.forEach((value,key)=>{
+
+                    let formattedDate: String = value.date.toString();
+                    console.log('pd2222', formattedDate.slice(5))
+
+                    pd.push(formattedDate.slice(5))
+                })
+                console.log('pd3333', pd)
+
+            return pd
+        })
+
+        setOptions((prevState:any)=>{
+            let pd={...prevState}
+            pd.labels= currentDates
+           return pd;
+        })
+        console.log('currentDates',options)
+    }
 
     return (
         <div id="" className="">
