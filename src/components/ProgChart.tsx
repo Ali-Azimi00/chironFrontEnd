@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback,useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import '../styles/charts.css';
 import axios from 'axios';
@@ -38,101 +38,33 @@ function ProgChart({ }: Object) {
     const [data1, setData1] = useState<IData[]>([])
     const [currentDates, setCurrentDates] = useState<any>([])
 
-    let dateMap = new Map<Date, IExperience>([])
-    for (let i=0; i< progData.length; i++){
-        let currentProg = progData[i];
-        dateMap.set(currentProg.date,currentProg)
-    }
-    /////////////////////////////////////////////
-    let taskMap = new Map<String, ITasks>()
-    for (let i = 0; i < progData.length; i++) {
-        let currentProg = progData[i];
-        taskMap.set(currentProg.tasks.taskName, currentProg.tasks)
-    }
-    console.log('taskMap', taskMap)
 
-    ///////////////////////////////////////////////////////////
+    // const fetchProgData = useCallback(async () => {
+    //     try {
+    //         const url = "http://localhost:8080/experience/1";
+    //         const response = await axios.get(url)
+    //         setProgData(response.data)
+    //     }
+    //     catch (error) {
+    //         console.error("axios call failed")
+    //         console.error(error)
+    //     }
+    // }, [])
 
-    let dataMap = new Map<String, IData>()
-    for (let i = 0; i < progData.length; i++) {
-        let currentDataProg = progData[i];
-        dataMap.set(currentDataProg.tasks.taskName, data1[i])
-    }
-
-    ///////////////////////////////////////////////////////////
-    let seriesMap = new Map<String, ISeries>()
-
-    taskMap.forEach((value, key) => {
-        let seriesPt = {
-            name: key,
-            data: []
-        }
-        seriesMap.set(key, seriesPt)
-    })
-
-    for (let i = 0; i < progData.length; i++) {
-        let currentProg = progData[i]
-
-        seriesMap.forEach((value, key1) => {
-            // console.log('key/value',key1,value)
-            let quantity: any = currentProg.completedQty;
-
-            if (currentProg.tasks.taskName == key1) {
-                let prevData: any | undefined = seriesMap.get(key1)?.data
-                prevData?.push(quantity)
-                // console.log('prevData', key1, prevData)
-                let value1: ISeries = {
-                    name: key1,
-                    data: prevData
-                }
-                seriesMap.set(key1, value1)
-            }
-        })
-        //  console.log("seriesMap",seriesMap)
-        // seriesMap.set(currentProg.tasks.taskName, currentSeriesData)
-
-    }
-    console.log("push", seriesMap.get('push'))
-
-
-    const fetchProgData = useCallback(async () => {
-        try {
+    useEffect(() => {
+        const fetchProgData = async () => {
             const url = "http://localhost:8080/experience/1";
-            const response = await axios.get(url)
-            setProgData(response.data)
-        }
-        catch (error) {
-            console.error("axios call failed")
-            console.error(error)
-        }
-    }, [])
 
-    useEffect(() => {
+            const result = await axios(url)
+            setProgData(result.data)
+
+        }
         fetchProgData();
-    }, [fetchProgData])
-
-    const updateData = () => {
-        setData1((prevState) => {
-            let pd = { ...prevState }
-            for (let i = 0; i < progData.length; i++) {
-                let currentData: IData = {
-                    date: progData[i].date,
-                    taskName: progData[i].tasks.taskName,
-                    quantity: progData[i].completedQty
-                }
-                pd[i] = currentData
-            }
-            return pd
-        })
-    }
-
-    useEffect(() => {
-        updateData();
     }, [progData])
-    // console.log('data', data1)
 
-    //////////////////////////////////////////////////////////////////////////////////////////
+    
 
+///////////////////////////////////SEEERIES///////////////////////////////////////
 
     //complete:1, incomoplete: 3, nothing: 0
     const [series, setSeries] = useState<any>([
@@ -151,26 +83,17 @@ function ProgChart({ }: Object) {
 
     ]);
 
-    // const updateSeries = () => {
-    //     const seriesArr = new Array<any>();
-
-    //     for (let i = 0; i < data1.length; i++) {
-    //         seriesArr.push(data1[i])
-    //     }
-    //     console.log('seriesArr', seriesArr)
-
-    //     setSeries(seriesArr)
-    // }
-
-    useEffect(()=>{
+    useEffect(() => {
         updateSeries();
         giveDates();
-    },[progData])
+        // updateData();
 
-    function updateSeries(){
-        setSeries(()=>{
-            let pd : any = []
-            seriesMap.forEach((value,key:String)=>{
+    }, [progData])
+
+    function updateSeries() {
+        setSeries(() => {
+            let pd: any = []
+            seriesMap.forEach((value, key: String) => {
                 let dataPt = {
                     name: key,
                     data: value.data
@@ -181,8 +104,6 @@ function ProgChart({ }: Object) {
         })
 
     }
-
-    console.log('SERIES', series)
 
     const [options, setOptions] = useState<any>(
         {
@@ -224,17 +145,14 @@ function ProgChart({ }: Object) {
                 labels: {
                     rotate: -90,
                     style: {
-                        colors: ["#3f3f3f", "#3f3f3f", "#3f3f3f",
-                            "#3f3f3f", "#3f3f3f", "#3f3f3f",
-                            "#3f3f3f", "#3f3f3f", "#3f3f3f",
-                            "#3f3f3f", "#3f3f3f", "#3f3f3f"]
+                        colors: "#3f3f3f"
                     }
                 },
                 axisTicks: {
                     show: false,
                     borderType: 'solid',
                     color: '#6f42c1',
-                    height: 6,
+                    height: 0,
                     offsetX: 0,
                     offsetY: 0
                 }
@@ -264,7 +182,7 @@ function ProgChart({ }: Object) {
                     show: false
                 },
                 fill: {
-                    color: ["#"],
+                    color: ["#3f3f3f"],
                     opacity: 0
                 }
                 ,
@@ -303,9 +221,8 @@ function ProgChart({ }: Object) {
             legend: {
                 show: false
             },
-            //DATE GOES HERE
+            //DATE
             labels: currentDates,
-            // ["8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21", "8/21"],
             grid: {
                 show: false,
                 padding: {
@@ -317,9 +234,9 @@ function ProgChart({ }: Object) {
             },
             plotOptions: {
                 heatmap: {
-                    radius: 0,
+                    radius: 9,
                     enableShades: true,
-                    shadeIntensity: .1,
+                    shadeIntensity: 0,
                     reverseNegativeShade: false,
                     //When enabled, it will reverse the shades for negatives but keep 
                     //the positive shades as it is now. An example of such use-case would 
@@ -332,53 +249,89 @@ function ProgChart({ }: Object) {
                             from: 0,
                             to: 1,
                             color: "#ffc107",
-                            // foreColor: "#dc3545",
+                            foreColor: "#dc3545",
                             name: undefined,
                         }],
-                        inverse: true,
-                        min: 0,
-                        max: 3
+                        inverse: false,
+                        // min: 0,
+                        // max: 30
                     },
                 }
             }
         }
     );
 
-    const giveDates=()=>{
-        // let dateArr: any[]=[]
-
-        // dateMap.forEach((value,key)=>{
-
-        //     let keyString = key.toString()
-
-        //     dateArr.push(keyString)
-        // })
-
-        // console.log(dateArr)
-        // return [dateArr];
-        setCurrentDates(()=>{
-            let pd: Array<String>=[]
-
-            // for(let i=0; i<dateMap.size;i++){
-                dateMap.forEach((value,key)=>{
-
-                    let formattedDate: String = value.date.toString();
-                    console.log('pd2222', formattedDate.slice(5))
-
-                    pd.push(formattedDate.slice(5))
-                })
-                console.log('pd3333', pd)
-
+    const giveDates = () => {
+        setCurrentDates(() => {
+            let pd: Array<String> = []
+            dateMap.forEach((value, key) => {
+                let formattedDate: String = value.date.toString();
+                // console.log('giveDatesFunction runs', formattedDate.slice(5))
+                pd.push(formattedDate.slice(5))
+            })
             return pd
         })
 
-        setOptions((prevState:any)=>{
-            let pd={...prevState}
-            pd.labels= currentDates
-           return pd;
+        setOptions((prevState: any) => {
+            let pd = { ...prevState }
+            pd.labels = currentDates
+            return pd;
         })
-        console.log('currentDates',options)
     }
+
+    
+    ///////////////////////MAAAAAAAAAPS////////////////////////////////////////////
+    let dateMap = new Map<Date, IExperience>([])
+    for (let i = 0; i < progData.length; i++) {
+        let currentProg = progData[i];
+        dateMap.set(currentProg.date, currentProg)
+    }
+    // console.log('dateMap',dateMap)
+   
+    let taskMap = new Map<String, ITasks>()
+    for (let i = 0; i < progData.length; i++) {
+        let currentProg = progData[i];
+        taskMap.set(currentProg.tasks.taskName, currentProg.tasks)
+    }
+    // console.log('taskMap', taskMap)
+
+
+    let dataMap = new Map<String, IData>()
+    for (let i = 0; i < progData.length; i++) {
+        let currentDataProg = progData[i];
+        dataMap.set(currentDataProg.tasks.taskName, data1[i])
+    }
+    // console.log('dataMap', dataMap)
+
+
+    let seriesMap = new Map<String, ISeries>()
+
+    taskMap.forEach((value, key) => {
+        let seriesPt = {
+            name: key,
+            data: []
+        }
+        seriesMap.set(key, seriesPt)
+    })
+
+    for (let i = 0; i < progData.length; i++) {
+        let currentProg = progData[i]
+
+        seriesMap.forEach((value, key1) => {
+            let quantity: any = currentProg.completedQty;
+
+            if (currentProg.tasks.taskName == key1) {
+                let prevData: any | undefined = seriesMap.get(key1)?.data
+                prevData?.push(quantity)
+                let value1: ISeries = {
+                    name: key1,
+                    data: prevData
+                }
+                seriesMap.set(key1, value1)
+            }
+        })
+    }
+
 
     return (
         <div id="" className="">
